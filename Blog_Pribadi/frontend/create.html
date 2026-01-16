@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Blog - Buat Post</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .api-info {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .form-note {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .debug-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 12px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">📝 SimpleBlog</div>
+                <nav>
+                    <ul>
+                        <li><a href="index.html">🏠 Home</a></li>
+                        <li><a href="create.html" class="active">✏️ Buat Post</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <div class="profile-info" id="profileInfo"></div>
+                    <button class="btn btn-danger" id="logoutBtn">🚪 Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div id="messageContainer"></div>
+            
+            <!-- API Debug Info -->
+            <div class="api-info">
+                <h4>📡 Info Endpoint Post:</h4>
+                <p><strong>Endpoint:</strong> <code>POST /posts/</code></p>
+                <p><strong>Format:</strong> <code>application/json</code> dengan Bearer token</p>
+                <p><strong>Status Token:</strong> <span id="tokenStatus">Mengecek...</span></p>
+            </div>
+            
+            <div class="form-container">
+                <h2 class="form-title" id="formTitle">✏️ Buat Postingan Baru</h2>
+                <p class="text-center mb-20" id="formDescription">Bagikan pemikiran dan ide Anda dengan dunia</p>
+                
+                <form id="postForm">
+                    <div class="form-group">
+                        <label for="title">Judul Postingan *</label>
+                        <input type="text" id="title" name="title" required 
+                               placeholder="Masukkan judul yang menarik">
+                        <div id="titleError" class="error-message"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="content">Isi Postingan *</label>
+                        <textarea id="content" name="content" required 
+                                  placeholder="Tulis isi postingan Anda di sini..."></textarea>
+                        <div id="contentError" class="error-message"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Kategori (Opsional)</label>
+                        <input type="text" id="category" name="category" 
+                               placeholder="Misal: Teknologi, Pendidikan, dll.">
+                        <p class="form-note">Kategori akan membantu pengunjung menemukan postingan Anda</p>
+                    </div>
+                    
+                    <!-- Debug Section (bisa dihide) -->
+                    <details class="debug-info">
+                        <summary>Debug Info</summary>
+                        <div>
+                            <p><strong>Token:</strong> <span id="debugToken"></span></p>
+                            <p><strong>Data yang akan dikirim:</strong></p>
+                            <pre id="debugData"></pre>
+                            <button type="button" onclick="testPostEndpoint()" class="btn btn-small">
+                                Test Endpoint
+                            </button>
+                        </div>
+                    </details>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <span id="btnText">📝 Publikasikan</span>
+                            <div id="btnLoading" class="loading-spinner" style="display: none; width: 20px; height: 20px;"></div>
+                        </button>
+                        <a href="index.html" class="form-link">
+                            Kembali ke Home
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2024 SimpleBlog. Dibuat dengan FastAPI & JavaScript.</p>
+        </footer>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let isEditMode = false;
+        let editPostId = null;
+        
+        // Tampilkan pesan
+        function showMessage(message, type = 'info') {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `
+                <div class="alert alert-${type}">
+                    ${message}
+                    <button class="close-alert-btn" style="background: none; border: none; font-size: 20px; cursor: pointer; margin-left: auto;">×</button>
+                </div>
+            `;
+            
+            // Close button event
+            container.querySelector('.close-alert-btn').addEventListener('click', () => {
+                container.innerHTML = '';
+            });
+            
+            setTimeout(() => {
+                if (container.innerHTML.includes('alert')) {
+                    container.innerHTML = '';
+                }
+            }, 5000);
+        }
+        
+        // Tampilkan error di field
+        function showFieldError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const errorDiv = document.getElementById(`${fieldId}Error`);
+            
+            if (field && errorDiv) {
+                field.classList.add('input-error');
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+            }
+        }
+        
+        // Hapus error dari field
+        function clearFieldError(fieldId) {
+            const field = document.getElementById(fieldId);
+            const errorDiv = document.getElementById(`${fieldId}Error`);
+            
+            if (field && errorDiv) {
+                field.classList.remove('input-error');
+                errorDiv.style.display = 'none';
+            }
+        }
+        
+        // Tampilkan loading state
+        function setLoading(isLoading) {
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoading = document.getElementById('btnLoading');
+            
+            if (isLoading) {
+                submitBtn.disabled = true;
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'inline-block';
+            } else {
+                submitBtn.disabled = false;
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+            }
+        }
+        
+        // Cek autentikasi
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const username = localStorage.getItem('username');
+            const profileInfo = document.getElementById('profileInfo');
+            const tokenStatus = document.getElementById('tokenStatus');
+            
+            if (!token || !username) {
+                window.location.href = 'login.html?message=' + 
+                    encodeURIComponent('Anda harus login terlebih dahulu');
+                return false;
+            }
+            
+            // Tampilkan info profil
+            const firstLetter = username.charAt(0).toUpperCase();
+            profileInfo.innerHTML = `
+                <div class="profile-avatar">${firstLetter}</div>
+                <span>${username}</span>
+            `;
+            
+            // Tampilkan token status
+            if (token) {
+                const tokenPreview = token.length > 30 ? token.substring(0, 30) + '...' : token;
+                document.getElementById('debugToken').textContent = tokenPreview;
+                tokenStatus.innerHTML = '<span style="color: #27ae60;">✅ Token valid</span>';
+            } else {
+                tokenStatus.innerHTML = '<span style="color: #e74c3c;">❌ Tidak ada token</span>';
+            }
+            
+            // Setup logout button
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            
+            return true;
+        }
+        
+        // Logout
+        function logout() {
+            if (confirm('Apakah Anda yakin ingin logout?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('username');
+                localStorage.removeItem('user_id');
+                localStorage.removeItem('user_email');
+                localStorage.removeItem('editPostId');
+                
+                window.location.href = 'index.html';
+            }
+        }
+        
+        // Validasi form
+        function validateForm() {
+            let isValid = true;
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+            
+            // Clear previous errors
+            clearFieldError('title');
+            clearFieldError('content');
+            
+            // Validasi title
+            if (!title) {
+                showFieldError('title', 'Judul harus diisi');
+                isValid = false;
+            } else if (title.length < 3) {
+                showFieldError('title', 'Judul minimal 3 karakter');
+                isValid = false;
+            }
+            
+            // Validasi content
+            if (!content) {
+                showFieldError('content', 'Isi postingan harus diisi');
+                isValid = false;
+            } else if (content.length < 10) {
+                showFieldError('content', 'Isi postingan minimal 10 karakter');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        // Update debug info
+        function updateDebugInfo() {
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+            const category = document.getElementById('category').value.trim();
+            
+            const postData = {
+                title: title,
+                content: content
+            };
+            
+            if (category) {
+                postData.category = category;
+            }
+            
+            document.getElementById('debugData').textContent = JSON.stringify(postData, null, 2);
+        }
+        
+        // Handle create/edit post - DIPERBAIKI untuk berbagai format
+        document.getElementById('postForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validasi
+            if (!validateForm()) {
+                return;
+            }
+            
+            const token = localStorage.getItem('token');
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+            const category = document.getElementById('category').value.trim();
+            
+            setLoading(true);
+            
+            try {
+                // Coba berbagai format data untuk kompatibilitas
+                const postDataVariants = [
+                    // Format 1: Basic format
+                    {
+                        title: title,
+                        content: content,
+                        category: category || null
+                    },
+                    // Format 2: With user_id jika diperlukan
+                    {
+                        title: title,
+                        content: content,
+                        category: category || null,
+                        user_id: localStorage.getItem('user_id')
+                    },
+                    // Format 3: Tanpa category field jika null
+                    {
+                        title: title,
+                        content: content,
+                        ...(category && { category: category })
+                    }
+                ];
+                
+                let success = false;
+                let lastError = null;
+                
+                // Coba setiap format sampai berhasil
+                for (const postData of postDataVariants) {
+                    console.log('Mengirim data posting (format):', postData);
+                    
+                    let url = `${API_URL}/posts`;
+                    let method = 'POST';
+                    
+                    // Jika mode edit, gunakan endpoint yang berbeda
+                    if (isEditMode && editPostId) {
+                        url = `${API_URL}/posts/${editPostId}`;
+                        method = 'PUT';
+                    }
+                    
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(postData)
+                    });
+                    
+                    console.log(`Response status (${method} ${url}):`, response.status);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('Post berhasil:', data);
+                        
+                        const message = isEditMode ? 
+                            '✅ Postingan berhasil diperbarui!' : 
+                            '✅ Postingan berhasil dibuat!';
+                        
+                        showMessage(message, 'success');
+                        success = true;
+                        
+                        // Reset form dan redirect
+                        if (!isEditMode) {
+                            document.getElementById('postForm').reset();
+                        }
+                        
+                        // Redirect ke halaman utama setelah 2 detik
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 2000);
+                        
+                        break; // Keluar dari loop jika berhasil
+                        
+                    } else {
+                        // Coba parse error message
+                        try {
+                            const errorData = await response.json();
+                            console.error('Error response:', errorData);
+                            lastError = errorData;
+                        } catch (parseError) {
+                            const errorText = await response.text();
+                            console.error('Raw error response:', errorText);
+                            lastError = { detail: errorText.substring(0, 200) };
+                        }
+                    }
+                }
+                
+                if (!success && lastError) {
+                    // Tampilkan error terakhir
+                    if (lastError.detail) {
+                        if (typeof lastError.detail === 'string') {
+                            showMessage(`❌ ${lastError.detail}`, 'error');
+                        } else if (Array.isArray(lastError.detail)) {
+                            // Handle array of errors
+                            const errors = lastError.detail.map(err => {
+                                if (err.loc && err.msg) {
+                                    const field = err.loc[err.loc.length - 1];
+                                    showFieldError(field, err.msg);
+                                    return `${field}: ${err.msg}`;
+                                }
+                                return err.msg || err;
+                            }).join(', ');
+                            
+                            if (errors) {
+                                showMessage(`❌ ${errors}`, 'error');
+                            }
+                        } else {
+                            showMessage(`❌ ${JSON.stringify(lastError.detail)}`, 'error');
+                        }
+                    } else {
+                        showMessage(`❌ ${isEditMode ? 'Update' : 'Pembuatan'} postingan gagal`, 'error');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Network error:', error);
+                showMessage('❌ Koneksi gagal. Periksa server dan koneksi jaringan.', 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+        
+        // Clear error saat user mengetik
+        document.getElementById('title').addEventListener('input', () => {
+            clearFieldError('title');
+            updateDebugInfo();
+        });
+        
+        document.getElementById('content').addEventListener('input', () => {
+            clearFieldError('content');
+            updateDebugInfo();
+        });
+        
+        document.getElementById('category').addEventListener('input', updateDebugInfo);
+        
+        // Load post data untuk edit
+        async function loadPostForEdit(postId) {
+            try {
+                const response = await fetch(`${API_URL}/posts/${postId}`);
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data postingan');
+                }
+                
+                const post = await response.json();
+                console.log('Data post untuk edit:', post);
+                
+                // Isi form dengan data postingan
+                // Coba berbagai kemungkinan field name
+                document.getElementById('title').value = post.title || post.Title || '';
+                document.getElementById('content').value = post.content || post.Content || post.body || '';
+                document.getElementById('category').value = post.category || post.Category || post.tags || '';
+                
+                updateDebugInfo();
+                
+            } catch (error) {
+                console.error('Error loading post:', error);
+                showMessage('❌ Gagal memuat data postingan', 'error');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            }
+        }
+        
+        // Test endpoint POST /posts
+        async function testPostEndpoint() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showMessage('❌ Tidak ada token. Silakan login terlebih dahulu.', 'error');
+                return;
+            }
+            
+            setLoading(true);
+            
+            try {
+                // Test dengan data minimal
+                const testData = {
+                    title: "Test Post from Debug",
+                    content: "This is a test post created from the debug section."
+                };
+                
+                console.log('Testing POST /posts dengan data:', testData);
+                
+                const response = await fetch(`${API_URL}/posts`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                console.log('Test response:', response.status, response.statusText);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showMessage(`✅ Test berhasil! Post dibuat dengan ID: ${data.id || 'N/A'}`, 'success');
+                    console.log('Test data:', data);
+                } else {
+                    const errorText = await response.text();
+                    showMessage(`❌ Test gagal (${response.status}): ${errorText.substring(0, 100)}`, 'error');
+                    console.error('Test error:', errorText);
+                }
+                
+            } catch (error) {
+                console.error('Test error:', error);
+                showMessage(`❌ Test error: ${error.message}`, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        // Cek apakah mode edit
+        function checkEditMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode');
+            const postId = urlParams.get('id') || localStorage.getItem('editPostId');
+            
+            if (mode === 'edit' && postId) {
+                isEditMode = true;
+                editPostId = postId;
+                
+                // Update UI untuk mode edit
+                document.getElementById('formTitle').textContent = '✏️ Edit Postingan';
+                document.getElementById('formDescription').textContent = 'Perbarui postingan Anda';
+                document.getElementById('btnText').textContent = '💾 Simpan Perubahan';
+                
+                // Load post data
+                loadPostForEdit(postId);
+            }
+        }
+        
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', () => {
+            if (checkAuth()) {
+                checkEditMode();
+                updateDebugInfo();
+                
+                // Cek jika ada pesan dari URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const message = urlParams.get('message');
+                const type = urlParams.get('type');
+                
+                if (message) {
+                    showMessage(decodeURIComponent(message), type || 'info');
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+                
+                // Test token validity
+                testTokenValidity();
+            }
+        });
+        
+        // Test token validity
+        async function testTokenValidity() {
+            const token = localStorage.getItem('token');
+            const tokenStatus = document.getElementById('tokenStatus');
+            
+            if (!token) {
+                tokenStatus.innerHTML = '<span style="color: #e74c3c;">❌ Tidak ada token</span>';
+                return;
+            }
+            
+            try {
+                // Coba ambil data user dengan token
+                const response = await fetch(`${API_URL}/users/me`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    tokenStatus.innerHTML = '<span style="color: #27ae60;">✅ Token valid</span>';
+                } else if (response.status === 401) {
+                    tokenStatus.innerHTML = '<span style="color: #e74c3c;">❌ Token tidak valid/expired</span>';
+                    showMessage('⚠️ Token tidak valid. Silakan login kembali.', 'warning');
+                } else {
+                    tokenStatus.innerHTML = `<span style="color: #f39c12;">⚠️ Status: ${response.status}</span>`;
+                }
+            } catch (error) {
+                tokenStatus.innerHTML = '<span style="color: #e74c3c;">❌ Error checking token</span>';
+            }
+        }
+        
+        // Expose function for debugging
+        window.testPostEndpoint = testPostEndpoint;
+    </script>
+</body>
+</html>

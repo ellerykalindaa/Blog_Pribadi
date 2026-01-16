@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Blog - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">📝 SimpleBlog</div>
+                <nav>
+                    <ul>
+                        <li><a href="index.html">🏠 Home</a></li>
+                        <li><a href="register.html">👤 Daftar</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <a href="login.html" class="btn btn-primary active">Login</a>
+                    <a href="register.html" class="btn btn-secondary">Daftar</a>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div id="messageContainer"></div>
+            
+            <div class="form-container">
+                <div class="text-center mb-30">
+                    <h1 class="form-title">Selamat Datang Kembali</h1>
+                    <p class="form-subtitle">Masuk ke akun Anda untuk melanjutkan</p>
+                </div>
+                
+                <!-- Demo Credentials -->
+                <div class="alert alert-info mb-30">
+                    <strong>🔑 Akun Demo:</strong> Username: <code>admin</code> | Password: <code>admin123</code>
+                    <button onclick="fillDemoCredentials()" class="btn-small" 
+                            style="margin-left: 10px; padding: 3px 10px; font-size: 12px;">
+                        Isi Demo
+                    </button>
+                </div>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">👤 Username</label>
+                        <input type="text" id="username" name="username" required 
+                               placeholder="Masukkan username Anda">
+                        <div id="usernameError" class="error-message"></div>
+                    </div>
+                    
+                    <div class="form-group password-toggle">
+                        <label for="password">🔒 Password</label>
+                        <input type="password" id="password" name="password" required 
+                               placeholder="Masukkan password Anda">
+                        <button type="button" class="toggle-password" id="togglePassword">👁️</button>
+                        <div id="passwordError" class="error-message"></div>
+                    </div>
+                    
+                    <div class="form-group d-flex justify-between align-center">
+                        <div>
+                            <input type="checkbox" id="remember" name="remember">
+                            <label for="remember" style="display: inline; font-weight: normal;">
+                                Ingat saya
+                            </label>
+                        </div>
+                        <a href="#" style="color: #667eea; text-decoration: none; font-size: 14px;">
+                            Lupa password?
+                        </a>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <span id="btnText">🚀 Masuk ke Akun</span>
+                            <div id="btnLoading" class="loading-spinner" style="display: none;"></div>
+                        </button>
+                        <div>
+                            <span style="color: #666;">Belum punya akun?</span>
+                            <a href="register.html" class="form-link">Daftar di sini</a>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-20" style="color: #888; font-size: 14px;">
+                    <p>Dengan login, Anda setuju dengan ketentuan penggunaan</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2024 SimpleBlog. Platform blogging sederhana untuk semua.</p>
+            <p class="footer-stats" id="footerStats"></p>
+        </footer>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+        
+        // Fill demo credentials
+        function fillDemoCredentials() {
+            document.getElementById('username').value = 'admin';
+            document.getElementById('password').value = 'admin123';
+            document.getElementById('remember').checked = true;
+            showMessage('✅ Credentials demo telah diisi', 'success');
+        }
+        
+        // Show message
+        function showMessage(message, type = 'info') {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `
+                <div class="alert alert-${type}">
+                    ${message}
+                    <button class="close-alert-btn">&times;</button>
+                </div>
+            `;
+            
+            container.querySelector('.close-alert-btn').addEventListener('click', () => {
+                container.innerHTML = '';
+            });
+            
+            setTimeout(() => {
+                if (container.innerHTML.includes('alert')) {
+                    container.innerHTML = '';
+                }
+            }, 5000);
+        }
+        
+        // Show field error
+        function showFieldError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const errorDiv = document.getElementById(`${fieldId}Error`);
+            
+            if (field && errorDiv) {
+                field.classList.add('input-error');
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+            }
+        }
+        
+        // Clear field error
+        function clearFieldError(fieldId) {
+            const field = document.getElementById(fieldId);
+            const errorDiv = document.getElementById(`${fieldId}Error`);
+            
+            if (field && errorDiv) {
+                field.classList.remove('input-error');
+                errorDiv.style.display = 'none';
+            }
+        }
+        
+        // Validate form
+        function validateForm() {
+            let isValid = true;
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            // Clear previous errors
+            clearFieldError('username');
+            clearFieldError('password');
+            
+            // Validate username
+            if (!username) {
+                showFieldError('username', 'Username harus diisi');
+                isValid = false;
+            }
+            
+            // Validate password
+            if (!password) {
+                showFieldError('password', 'Password harus diisi');
+                isValid = false;
+            } else if (password.length < 3) {
+                showFieldError('password', 'Password terlalu pendek');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        // Set loading state
+        function setLoading(isLoading) {
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoading = document.getElementById('btnLoading');
+            
+            if (isLoading) {
+                submitBtn.disabled = true;
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'block';
+            } else {
+                submitBtn.disabled = false;
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+            }
+        }
+        
+        // Handle login form
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            
+            setLoading(true);
+            
+            try {
+                const loginData = {
+                    username: username,
+                    password: password
+                };
+                
+                console.log('Login request:', { ...loginData, password: '***' });
+                
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Save token and user data
+                    localStorage.setItem('token', result.access_token);
+                    localStorage.setItem('username', username);
+                    
+                    if (remember) {
+                        // Store in longer-term storage if needed
+                        localStorage.setItem('rememberedUser', username);
+                    }
+                    
+                    showMessage('✅ Login berhasil! Mengalihkan...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                    
+                } else {
+                    if (result.detail) {
+                        showMessage(`❌ ${result.detail}`, 'error');
+                        
+                        if (typeof result.detail === 'string') {
+                            if (result.detail.toLowerCase().includes('username')) {
+                                showFieldError('username', result.detail);
+                            } else if (result.detail.toLowerCase().includes('password')) {
+                                showFieldError('password', result.detail);
+                            }
+                        }
+                    } else {
+                        showMessage(`❌ Login gagal (${response.status})`, 'error');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showMessage('❌ Terjadi kesalahan. Coba lagi nanti.', 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+        
+        // Clear errors on input
+        document.getElementById('username').addEventListener('input', () => clearFieldError('username'));
+        document.getElementById('password').addEventListener('input', () => clearFieldError('password'));
+        
+        // Check if already logged in
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                window.location.href = 'index.html';
+            }
+            
+            // Check for URL messages
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            const type = urlParams.get('type');
+            
+            if (message) {
+                showMessage(decodeURIComponent(message), type || 'info');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            
+            // Auto fill remembered user
+            const rememberedUser = localStorage.getItem('rememberedUser');
+            if (rememberedUser) {
+                document.getElementById('username').value = rememberedUser;
+                document.getElementById('remember').checked = true;
+            }
+            
+            // Update footer stats
+            updateFooterStats();
+            
+            // Auto fill demo for testing
+            if (window.location.search.includes('demo=true')) {
+                setTimeout(fillDemoCredentials, 500);
+            }
+        });
+        
+        // Update footer stats
+        async function updateFooterStats() {
+            try {
+                const response = await fetch(`${API_URL}/posts`);
+                if (response.ok) {
+                    const posts = await response.json();
+                    const statsDiv = document.getElementById('footerStats');
+                    if (statsDiv) {
+                        statsDiv.textContent = `📊 ${Array.isArray(posts) ? posts.length : 0} postingan tersedia`;
+                    }
+                }
+            } catch (error) {
+                // Silent fail
+            }
+        }
+    </script>
+</body>
+</html>

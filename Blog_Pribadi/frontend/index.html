@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Blog - Home</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">📝 SimpleBlog</div>
+                <nav>
+                    <ul>
+                        <li><a href="index.html" class="active">🏠 Home</a></li>
+                        <li><a href="create.html">✏️ Buat Post</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <a href="login.html" class="btn btn-secondary" id="loginBtn">🔑 Login</a>
+                    <a href="register.html" class="btn btn-primary" id="registerBtn">👤 Register</a>
+                    <button class="btn btn-danger" id="logoutBtn" style="display: none;">🚪 Logout</button>
+                    <span id="userInfo" style="color: white; margin-left: 10px; display: none;"></span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <h1>📚 Postingan Terbaru</h1>
+            
+            <div id="messageContainer"></div>
+            
+            <div class="posts-container" id="postsContainer">
+                <div class="loading">Memuat postingan...</div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2024 SimpleBlog. Dibuat dengan FastAPI & JavaScript.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Konfigurasi
+        const API_URL = 'http://localhost:8000';
+        let currentUser = null;
+
+        // Cek apakah user sudah login
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const username = localStorage.getItem('username');
+            const loginBtn = document.getElementById('loginBtn');
+            const registerBtn = document.getElementById('registerBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const userInfo = document.getElementById('userInfo');
+
+            if (token && username) {
+                currentUser = {
+                    username: username,
+                    token: token
+                };
+                
+                loginBtn.style.display = 'none';
+                registerBtn.style.display = 'none';
+                logoutBtn.style.display = 'inline-block';
+                userInfo.style.display = 'inline-block';
+                userInfo.textContent = `👋 Halo, ${username}`;
+            }
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            window.location.href = 'index.html';
+        }
+
+        // Tampilkan pesan
+        function showMessage(message, type = 'info') {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `
+                <div class="alert alert-${type}">
+                    ${message}
+                </div>
+            `;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        // Ambil semua postingan
+        async function loadPosts() {
+            try {
+                const response = await fetch(`${API_URL}/posts`);
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil postingan');
+                }
+                
+                const posts = await response.json();
+                const container = document.getElementById('postsContainer');
+                container.innerHTML = '';
+                
+                if (posts.length === 0) {
+                    container.innerHTML = '<div class="alert alert-info">Belum ada postingan. Jadilah yang pertama!</div>';
+                    return;
+                }
+                
+                posts.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.className = 'post-card';
+                    postElement.innerHTML = `
+                        <div class="post-header">
+                            <h2 class="post-title">${post.title}</h2>
+                            <div class="post-meta">
+                                <span class="post-author">✍️ ${post.user?.username || 'Unknown'}</span>
+                                <span class="post-date"> • 📅 ${new Date(post.created_at).toLocaleDateString('id-ID')}</span>
+                            </div>
+                        </div>
+                        <div class="post-content">${post.content}</div>
+                        ${currentUser && currentUser.username === post.user?.username ? `
+                            <div class="post-actions">
+                                <button class="btn btn-danger" onclick="deletePost(${post.id})">🗑️ Hapus</button>
+                            </div>
+                        ` : ''}
+                    `;
+                    container.appendChild(postElement);
+                });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('postsContainer').innerHTML = 
+                    '<div class="alert alert-error">Gagal memuat postingan. Silakan coba lagi.</div>';
+            }
+        }
+
+        // Hapus postingan
+        async function deletePost(postId) {
+            if (!confirm('Apakah Anda yakin ingin menghapus postingan ini?')) {
+                return;
+            }
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showMessage('Anda harus login terlebih dahulu', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/posts/${postId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    showMessage('✅ Postingan berhasil dihapus', 'success');
+                    loadPosts(); // Muat ulang postingan
+                } else {
+                    const error = await response.json();
+                    showMessage(`❌ ${error.detail || 'Gagal menghapus postingan'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ Gagal menghapus postingan', 'error');
+            }
+        }
+
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadPosts();
+            
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            
+            // Cek jika ada pesan dari URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            const type = urlParams.get('type');
+            
+            if (message) {
+                showMessage(decodeURIComponent(message), type || 'success');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        });
+    </script>
+</body>
+</html>
