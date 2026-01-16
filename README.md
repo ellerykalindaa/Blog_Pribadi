@@ -1,5 +1,6 @@
 # Blog_Pribadi
 blog pribadi adalah sistem server-side yang mengelola data dan logika aplikasi blog. Tujuannya adalah menyediakan API untuk membuat, membaca, memperbarui, dan menghapus (CRUD) postingan blog, mengelola pengguna, komentar, dan autentikasi, sambil memastikan keamanan dan performa.
+<hr style="border:1px solid black;">
 # Daftar Anggota Kelompok 3
 1. I Putu Mahardika ( 240030041 ) --> username GitHub : putumahardika
 2. I NYOMAN REYNALD ADITYA PARMANDA ( 240030245 )  --> username GitHub : 
