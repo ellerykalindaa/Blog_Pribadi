@@ -49,7 +49,11 @@ blog pribadi adalah sistem server-side yang mengelola data dan logika aplikasi b
                               ** Atribut Username sebagai ForeignKey
                               ** Atribut Isi
   <br> Untuk relasi User setelah melakukan Registrasi atau Login ke Create_Post yaitu One to Many >> yang dimana 1 User bisa membuat banyak postingan baru di Blog Pribadi ( bermacam judul ataupun kategori)
+  
+  ---
   <br> Dan untuk User, relasi di dalam Create_Post ke Komentar yaitu One to Many >> yang dimana dalam 1 postingan blog bisa membuat banyak komentar, jadi dalam 1 postingan User bisa berkomentar banyak.
+
+  ---
   <br> Serta jika anda langsung melakukan login ataupun masuk dengan register, anda juga bisa langsung melakukan komentar di sebuah postingan >> dengan relasi One to Many >> yang dimana dalam 1 postingan blog bisa membuat banyak komentar
 
 
