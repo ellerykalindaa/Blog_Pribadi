@@ -14,11 +14,12 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
 def create_post(
     data: PostCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)  # ⬅️ DI SINI
+    current_user: User = Depends(get_current_user) 
 ):
     post = Post(
         title=data.title,
         content=data.content,
+        author_id=current_user.id,
         author_id=current_user.id
     )
     db.add(post)
@@ -83,3 +84,4 @@ def update_post(
     db.commit()
     db.refresh(post)
     return post
+
