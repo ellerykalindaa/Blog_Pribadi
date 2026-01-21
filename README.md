@@ -23,7 +23,8 @@ blog pribadi adalah sistem server-side yang mengelola data dan logika aplikasi b
 
 ## ERD dari Database Blog Pribadi
 
-![ERD Blog Pribadi]([URL_yang_disalin_dari_langkah_3](https://github.com/ellerykalindaa/Blog_Pribadi/blob/0f78d43abfaead781647fdabf4cbfd481b1debc7/blogPribadi.drawio.png))
+![ERD Blog Pribadi](https://github.com/ellerykalindaa/Blog_Pribadi/blob/0f78d43abfaead781647fdabf4cbfd481b1debc7/blogPribadi.drawio.png)
+
 
 
 
