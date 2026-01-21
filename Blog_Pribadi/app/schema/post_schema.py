@@ -5,7 +5,7 @@ from typing import Optional
 class PostCreate(BaseModel):
     title: str
     content: str
-    category_id: Optional[int] = None
+    category_id: int
 
 class PostUpdate(BaseModel):
     title: str
@@ -20,8 +20,7 @@ class PostResponse(BaseModel):
     author_id: int              
     category_id: Optional[int]
 
-    class Config:
-        from_attributes = True 
+    model_config = ConfigDict(from_attributes=True)
 
 class CommentResponse(BaseModel):
     id: int
@@ -31,4 +30,5 @@ class CommentResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
 
