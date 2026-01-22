@@ -8,8 +8,8 @@ blog pribadi adalah sistem server-side yang mengelola data dan logika aplikasi b
 <br>1. I Putu Mahardika ( 240030041 ) --> username GitHub : putumahardika
 <br>2. I NYOMAN REYNALD ADITYA PARMANDA ( 240030245 )  --> username GitHub : reynaldaditya 
 <br>3. MADE ELLERY KALINDA ( 240030341 )  --> username GitHub : ellerykalindaa
-<br>4. I MADE BAGUS SATRIA PAWANA KESUMA PUTRA ( 240030244 )  --> username GitHub :
-<br>5. ALIF DZULFIKAR BAGHIS ( 200030710 )  --> username GitHub :
+<br>4. I MADE BAGUS SATRIA PAWANA KESUMA PUTRA ( 240030244 )  --> username GitHub : 
+<br>5. ALIF DZULFIKAR BAGHIS ( 200030710 )  --> username GitHub : 
 <hr>
 
 ## Lingkungan Pengembangan dari Blog Pribadi
@@ -109,6 +109,126 @@ Fitur komentar memungkinkan interaksi antar pengguna dalam aplikasi blog.
   <br> *Serta jika anda langsung melakukan login ataupun masuk dengan register, anda juga bisa langsung melakukan komentar di sebuah postingan >> dengan relasi One to Many >> yang dimana dalam 1 postingan blog bisa membuat banyak komentar
 
 ## Struktur/Informasi Detail Tabel Database
+### 1. User 
+| Field | Tipe Data | Keterangan |
+|------|----------|------------|
+| id | INT | Primary Key |
+| name | VARCHAR(100) | Nama lengkap |
+| username | VARCHAR(50) | Username login (unique) |
+| email | VARCHAR(100) | Email user (unique) |
+| password | VARCHAR(255) | Password terenkripsi |
+| role | ENUM('admin','author') | Hak akses user |
+| bio | TEXT | Deskripsi singkat penulis |
+| password | TIMESTAMP | Tanggal dibuat |
+| photo | VARCHAR(255) | Foto profil |
+| created_at | TIMESTAMP | Tanggal dibuat |
+| updated_at | TIMESTAMP | Tanggal diperbarui |
+
+### 2. Tabel (categories)
+| Field | Tipe Data | Keterangan |
+|------|----------|------------|
+| id | INT | Primary Key Kategori |
+| name | VARCHAR(100) | Nama kategori |
+| slug | VARCHAR(120) | URL kategori |
+| created_at | TIMESTAMP | Tanggal dibuat |
+| updated_at | TIMESTAMP | Tanggal diperbarui |
+
+### 3. Tabel (post)
+| Field | Tipe Data | Keterangan |
+|------|----------|------------|
+| id | INT | Primary Key Post |
+| user.id |INT (FK) | Relasi ke users |
+| category_id | INT (FK) | Relasi ke categories |
+| title | VARCHAR(200) | Judul artikel |
+| slug | VARCHAR(220) | URL artikel |
+| content | TEXT | Isi artikel |
+| thumbnail | VARCHAR(255) | Gambar artikel |
+| status | ENUM('draft','published') | Status artikel |
+| views | INT | Jumlah kunjungan |
+| created_at | TIMESTAMP | Tanggal dibuat |
+| updated_at | TIMESTAMP | Tanggal diperbarui |
+
+### 4. Tabel (comments)
+| Field | Tipe Data | Keterangan |
+|------|----------|------------|
+| id | INT | Primary Key Kategori |
+| post_id |INT (FK) | Relasi ke posts |
+| name | VARCHAR(100) | Nama komentator |
+| email | VARCHAR(100) | Email komentator |
+| comment | TEXT | Isi komentar |
+| status | ENUM('pending','approved') | Status moderasi |
+| created_at | TIMESTAMP | Tanggal komentar |
+
+### 5. Tabel (tags)
+| Field | Tipe Data | Keterangan |
+|------|----------|------------|
+| id | INT | Primary key tag |
+| name | VARCHAR(50) | Nama tag |
+| slug | VARCHAR(60) | URL tag |
+
+### 6. Tabel Post (tags)
+| Field | Tipe Data | Keterangan |
+|------|----------|------------|
+| post_id |INT (FK) | Relasi ke posts |
+| tag_id | INT (FK) | Relasi ke tags |
+
+### 7. Tabel (settings)
+| Field | Tipe Data | Keterangan |
+|------|----------|------------|
+| id | INT (PK) | Primary key |
+| site_name | VARCHAR(100) | Nama blog |
+| description | TEXT | Deskripsi blog |
+| logo | VARCHAR(255) | Logo blog |
+| email | VARCHAR(100) | Email admin |
+
+### Relasi Antar Tabel
+  * users (1) —— (N) posts
+  * categories (1) —— (N) posts
+  * posts (1) —— (N) comments
+  * posts (N) —— (N) tags melalui post_tags
+
+## Hasil Pengembangan 
+### 1. Modul Autentikasi
+Modul ini menangani seluruh proses keamanan pengguna, meliputi:
+  * Registrasi pengguna
+  * Login pengguna
+  * Pembuatan dan validasi JWT
+  * Proteksi endpoint menggunakan dependency FastAPI
+Modul ini memastikan bahwa hanya pengguna yang terautentikasi yang dapat mengakses fitur tertentu.
+
+### 2. Modul Post
+Modul Post merupakan inti dari aplikasi blog, dengan fitur:
+  * Create Post (posting otomatis memiliki author)
+  * Get All Posts (menampilkan username author)
+  * Get Post by ID
+  * Update Post (hanya oleh author)
+  * Delete Post (hanya oleh author)
+Modul ini terhubung langsung dengan database melalui SQLAlchemy ORM dan menerapkan validasi data menggunakan Pydantic Schema.
+
+### 3. Modul Kategori
+Modul ini memungkinkan pengelolaan kategori posting, yang mencakup:
+  * Menambahkan kategori baru
+  * Menghubungkan kategori dengan posting
+  * Menyimpan relasi kategori dalam database
+
+### 4. Modul Komentar
+  * Modul komentar berfungsi untuk:
+  * Menambahkan komentar ke posting
+  * Menampilkan komentar berdasarkan posting
+  * Menyimpan relasi antara komentar, pengguna, dan posting
+
+### 5. Database dan ORM
+Aplikasi menggunakan:
+  * SQLite sebagai database
+  * SQLAlchemy ORM untuk pengelolaan data
+  * Relasi antar tabel:
+        ** User ↔ Post
+        ** Post ↔ Category
+        ** Post ↔ Comment
+        ** User ↔ Comment
+Pendekatan ORM mempermudah pengelolaan data dan menjaga konsistensi struktur database.
+
+## Struktur Folder
 ```
 app/
 │
@@ -150,29 +270,35 @@ app/
     # Entry point aplikasi
 ```
 
-## Hasil Pengembangan 
-### 1. Modul Autentikasi
-Modul ini menangani seluruh proses keamanan pengguna, meliputi:
-  * Registrasi pengguna
-  * Login pengguna
-  * Pembuatan dan validasi JWT
-  * Proteksi endpoint menggunakan dependency FastAPI
-Modul ini memastikan bahwa hanya pengguna yang terautentikasi yang dapat mengakses fitur tertentu.
-
-### 2. Modul Post
-Modul Post merupakan inti dari aplikasi blog, dengan fitur:
-
-Create Post (posting otomatis memiliki author)
-Get All Posts (menampilkan username author)
-Get Post by ID
-Update Post (hanya oleh author)
-Delete Post (hanya oleh author)
-Modul ini terhubung langsung dengan database melalui SQLAlchemy ORM dan menerapkan validasi data menggunakan Pydantic Schema.
-
-
-
-
-
+## Cara Instalasi dan Menjalankan Informasi
+### 1. Clone Repository
+```
+git clone <url-repository>
+cd Blog_Pribadi
+```
+### 2. Membuat dan Mengaktifkan Virtual Environment
+```
+python -m venv .venv
+.venv\Scripts\activate
+```
+### 3. Instalasi Dependency
+```
+pip install -r requirements.txt
+```
+### 4. Menjalankan Server
+```
+uvicorn app.main:app --reload
+```
+### 5. Akses Dokumentasi API
+FastAPI menyediakan dokumentasi otomatis:
+  * Swagger UI
+    ```
+    http://127.0.0.1:8000/docs
+    ```
+  * ReDoc
+    ```
+    http://127.0.0.1:8000/redoc
+    ```
 
 
 
