@@ -6,7 +6,7 @@ blog pribadi adalah sistem server-side yang mengelola data dan logika aplikasi b
 
 ## Daftar Anggota Kelompok 3
 <br>1. I Putu Mahardika ( 240030041 ) --> username GitHub : putumahardika
-<br>2. I NYOMAN REYNALD ADITYA PARMANDA ( 240030245 )  --> username GitHub : 
+<br>2. I NYOMAN REYNALD ADITYA PARMANDA ( 240030245 )  --> username GitHub : reynaldaditya 
 <br>3. MADE ELLERY KALINDA ( 240030341 )  --> username GitHub : ellerykalindaa
 <br>4. I MADE BAGUS SATRIA PAWANA KESUMA PUTRA ( 240030244 )  --> username GitHub :
 <br>5. ALIF DZULFIKAR BAGHIS ( 200030710 )  --> username GitHub :
