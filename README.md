@@ -15,7 +15,8 @@ blog pribadi adalah sistem server-side yang mengelola data dan logika aplikasi b
 1. I Putu Mahardika ->
    * Membuat Dokumentasi Program Sistem Blog Pribadi di Readme,
    * Membuat ERD dari Sistem Blog Pribadi
-   * Membantu merancang Struktur, Diskusi awal dalam menentukan konsep pembuatan,
+   * Membantu merancang Struktur,
+   * Diskusi awal dalam menentukan konsep pembuatan,
    * Mengusulkan Frontend,
    * Membantu menyelesaikan Backend dari Blog Pribadi,
    * Membantu Membuat Frontend.
