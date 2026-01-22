@@ -144,7 +144,6 @@ Fitur komentar memungkinkan interaksi antar pengguna dalam aplikasi blog.
 |------|----------|------------|
 | id | INT | Primary Key |
 | name | VARCHAR(100) | Nama lengkap |
-| username | VARCHAR(50) | Username login (unique) |
 | password | VARCHAR(255) | Password terenkripsi |
 | created_at | TIMESTAMP | Tanggal dibuat |
 | updated_at | TIMESTAMP | Tanggal diperbarui |
@@ -181,7 +180,6 @@ Fitur komentar memungkinkan interaksi antar pengguna dalam aplikasi blog.
   * users (1) —— (N) posts
   * categories (1) —— (N) posts
   * posts (1) —— (N) comments
-  * posts (N) —— (N) tags melalui post_tags
 
 ## VII. Hasil Pengembangan 
 ### 1. Modul Autentikasi
