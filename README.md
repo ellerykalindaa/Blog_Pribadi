@@ -12,11 +12,11 @@ blog pribadi adalah sistem server-side yang mengelola data dan logika aplikasi b
 <br>5. ALIF DZULFIKAR BAGHIS ( 200030710 )  --> username GitHub : 
 
 ### Peran dan Tugas setiap Anggota :
-  * 1. I Putu Mahardika -> Membuat Dokumentasi Program Sistem Blog Pribadi di Readme, Membantu merancang Struktur, Diskusi awal dalam menentukan konsep pembuatan
-  * 2. I NYOMAN REYNALD ADITYA PARMANDA ->
-  * 3. MADE ELLERY KALINDA ->
-  * 4. I MADE BAGUS SATRIA PAWANA KESUMA PUTRA ->
-  * 5. ALIF DZULFIKAR BAGHIS -> Report : Gaguna, AFK, Menyusahkan Tim, Tidak ada Berkontribusi
+1. I Putu Mahardika -> Membuat Dokumentasi Program Sistem Blog Pribadi di Readme, Membantu merancang Struktur, Diskusi awal dalam menentukan konsep pembuatan, Mengusulkan Frontend,Membantu menyelesaikan Backend dari Blog Pribadi, Membantu Membuat Frontend
+2. I NYOMAN REYNALD ADITYA PARMANDA -> Diskusi awal dalam menentukan konsep pembuatan,Membantu merancang Struktur Program, Menyelesaikan Backend dari Blog Pribadi, Membuat Frontend
+3. MADE ELLERY KALINDA -> Diskusi awal dalam menentukan konsep pembuatan, Membantu merancang Struktur Program, Menyelesaikan Backend dari Blog Pribadi, Membantu Membuat Frontend
+4. I MADE BAGUS SATRIA PAWANA KESUMA PUTRA -> Diskusi awal dalam menentukan konsep pembuatan, Membantu merancang Struktur Program, Membuat PPT Materi dari Program Blog Pribadi untuk di persentasikan
+# 5. ALIF DZULFIKAR BAGHIS -> Report : Gaguna, AFK, Menyusahkan Tim, Tidak ada Berkontribusi
     
 <hr>
   
