@@ -46,13 +46,13 @@ blog pribadi adalah sistem server-side yang mengelola data dan logika aplikasi b
   ###  Alat dan Teknologi:
     * Laptop >> Digunakan untuk membuat atau mengeksekusi kode program, masing - masing orang menggunakan laptop untuk terlibat dalam pengerjaan project blog pribadi ini
     * Discord >> Kita menggunakan alat komunikasi yaitu app Discord, yang memudahkan kita untuk saling berinteraksi dari jarak jauh dalam pembuatan project blog pribadi ini
-    * FastAPI
-    * SQLAlchemy
-    * SQLite
-    * Pydantic
-    * JWT Authentication
-    * Python
-
+    * FastAPI >> Framework Python modern untuk membangun API dengan performa tinggi. Digunakan untuk membuat backend API yang cepat dan efisien dengan fitur dokumentasi otomatis.
+    * SQLAlchemy >> ORM (Object-Relational Mapping) untuk Python yang memudahkan interaksi dengan database. Mengubah operasi database menjadi kode Python yang lebih mudah dipahami dan dikelola.
+    * SQLite >> Database relational yang ringan dan tidak memerlukan server terpisah. Cocok untuk development dan aplikasi skala kecil hingga menengah seperti blog pribadi.
+    * Pydantic >> Library untuk validasi data dan parsing menggunakan Python type hints. Memastikan data yang masuk ke sistem sesuai dengan format yang diharapkan.
+    * JWT Authentication >> Sistem autentikasi menggunakan JSON Web Token untuk mengamankan API. Memungkinkan user login dan akses yang aman ke fitur-fitur tertentu.
+    * Python >> Bahasa pemrograman utama yang digunakan untuk mengembangkan seluruh sistem backend.
+Kombinasi teknologi ini membentuk stack yang solid untuk membangun blog pribadi dengan backend yang aman, efisien, dan mudah di-maintain.
 ## IV. Proses Bisnis dari Blog Pribadi
 ### 1. Registrasi Pengguna
 Pengguna yang belum memiliki akun dapat melakukan registrasi dengan memasukkan data berupa username dan password.
@@ -145,12 +145,7 @@ Fitur komentar memungkinkan interaksi antar pengguna dalam aplikasi blog.
 | id | INT | Primary Key |
 | name | VARCHAR(100) | Nama lengkap |
 | username | VARCHAR(50) | Username login (unique) |
-| email | VARCHAR(100) | Email user (unique) |
 | password | VARCHAR(255) | Password terenkripsi |
-| role | ENUM('admin','author') | Hak akses user |
-| bio | TEXT | Deskripsi singkat penulis |
-| password | TIMESTAMP | Tanggal dibuat |
-| photo | VARCHAR(255) | Foto profil |
 | created_at | TIMESTAMP | Tanggal dibuat |
 | updated_at | TIMESTAMP | Tanggal diperbarui |
 
@@ -159,7 +154,6 @@ Fitur komentar memungkinkan interaksi antar pengguna dalam aplikasi blog.
 |------|----------|------------|
 | id | INT | Primary Key Kategori |
 | name | VARCHAR(100) | Nama kategori |
-| slug | VARCHAR(120) | URL kategori |
 | created_at | TIMESTAMP | Tanggal dibuat |
 | updated_at | TIMESTAMP | Tanggal diperbarui |
 
@@ -170,11 +164,7 @@ Fitur komentar memungkinkan interaksi antar pengguna dalam aplikasi blog.
 | user.id |INT (FK) | Relasi ke users |
 | category_id | INT (FK) | Relasi ke categories |
 | title | VARCHAR(200) | Judul artikel |
-| slug | VARCHAR(220) | URL artikel |
 | content | TEXT | Isi artikel |
-| thumbnail | VARCHAR(255) | Gambar artikel |
-| status | ENUM('draft','published') | Status artikel |
-| views | INT | Jumlah kunjungan |
 | created_at | TIMESTAMP | Tanggal dibuat |
 | updated_at | TIMESTAMP | Tanggal diperbarui |
 
@@ -184,32 +174,8 @@ Fitur komentar memungkinkan interaksi antar pengguna dalam aplikasi blog.
 | id | INT | Primary Key Kategori |
 | post_id |INT (FK) | Relasi ke posts |
 | name | VARCHAR(100) | Nama komentator |
-| email | VARCHAR(100) | Email komentator |
 | comment | TEXT | Isi komentar |
-| status | ENUM('pending','approved') | Status moderasi |
 | created_at | TIMESTAMP | Tanggal komentar |
-
-### 5. Tabel (tags)
-| Field | Tipe Data | Keterangan |
-|------|----------|------------|
-| id | INT | Primary key tag |
-| name | VARCHAR(50) | Nama tag |
-| slug | VARCHAR(60) | URL tag |
-
-### 6. Tabel Post (tags)
-| Field | Tipe Data | Keterangan |
-|------|----------|------------|
-| post_id |INT (FK) | Relasi ke posts |
-| tag_id | INT (FK) | Relasi ke tags |
-
-### 7. Tabel (settings)
-| Field | Tipe Data | Keterangan |
-|------|----------|------------|
-| id | INT (PK) | Primary key |
-| site_name | VARCHAR(100) | Nama blog |
-| description | TEXT | Deskripsi blog |
-| logo | VARCHAR(255) | Logo blog |
-| email | VARCHAR(100) | Email admin |
 
 ### Relasi Antar Tabel
   * users (1) —— (N) posts
