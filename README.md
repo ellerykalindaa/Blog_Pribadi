@@ -1,10 +1,10 @@
 # Blog Pribadi
 
-## Blog Pribadi
+## I. Blog Pribadi
 blog pribadi adalah sistem server-side yang mengelola data dan logika aplikasi blog. Tujuannya adalah menyediakan API untuk membuat, membaca, memperbarui, dan menghapus (CRUD) postingan blog, mengelola pengguna, komentar, dan autentikasi, sambil memastikan keamanan dan performa.
 <hr>
 
-## Daftar Anggota Kelompok 3
+## II. Daftar Anggota Kelompok 3
 <br>1. I Putu Mahardika ( 240030041 ) --> username GitHub : putumahardika
 <br>2. I NYOMAN REYNALD ADITYA PARMANDA ( 240030245 )  --> username GitHub : reynaldaditya 
 <br>3. MADE ELLERY KALINDA ( 240030341 )  --> username GitHub : ellerykalindaa
@@ -12,7 +12,7 @@ blog pribadi adalah sistem server-side yang mengelola data dan logika aplikasi b
 <br>5. ALIF DZULFIKAR BAGHIS ( 200030710 )  --> username GitHub : 
 <hr>
 
-## Lingkungan Pengembangan dari Blog Pribadi
+## III. Lingkungan Pengembangan dari Blog Pribadi
   ###  Alat dan Teknologi:
     * Laptop >> Digunakan untuk membuat atau mengeksekusi kode program, masing - masing orang menggunakan laptop untuk terlibat dalam pengerjaan project blog pribadi ini
     * Discord >> Kita menggunakan alat komunikasi yaitu app Discord, yang memudahkan kita untuk saling berinteraksi dari jarak jauh dalam pembuatan project blog pribadi ini
@@ -23,7 +23,7 @@ blog pribadi adalah sistem server-side yang mengelola data dan logika aplikasi b
     * JWT Authentication
     * Python
 
-## Proses Bisnis dari Blog Pribadi
+## IV. Proses Bisnis dari Blog Pribadi
 ### 1. Registrasi Pengguna
 Pengguna yang belum memiliki akun dapat melakukan registrasi dengan memasukkan data berupa username dan password.
 Sistem akan:
@@ -71,7 +71,7 @@ Menyimpan informasi waktu pembuatan komentar
 
 Fitur komentar memungkinkan interaksi antar pengguna dalam aplikasi blog.
 
-## ERD dari Database Blog Pribadi
+## V. ERD dari Database Blog Pribadi
 
 ![ERD Blog Pribadi](https://github.com/ellerykalindaa/Blog_Pribadi/blob/0f78d43abfaead781647fdabf4cbfd481b1debc7/blogPribadi.drawio.png)
 ### Entity :
@@ -108,7 +108,7 @@ Fitur komentar memungkinkan interaksi antar pengguna dalam aplikasi blog.
   ---
   <br> *Serta jika anda langsung melakukan login ataupun masuk dengan register, anda juga bisa langsung melakukan komentar di sebuah postingan >> dengan relasi One to Many >> yang dimana dalam 1 postingan blog bisa membuat banyak komentar
 
-## Struktur/Informasi Detail Tabel Database
+## VI. Struktur/Informasi Detail Tabel Database
 ### 1. User 
 | Field | Tipe Data | Keterangan |
 |------|----------|------------|
@@ -187,7 +187,7 @@ Fitur komentar memungkinkan interaksi antar pengguna dalam aplikasi blog.
   * posts (1) —— (N) comments
   * posts (N) —— (N) tags melalui post_tags
 
-## Hasil Pengembangan 
+## VII. Hasil Pengembangan 
 ### 1. Modul Autentikasi
 Modul ini menangani seluruh proses keamanan pengguna, meliputi:
   * Registrasi pengguna
@@ -228,7 +228,7 @@ Aplikasi menggunakan:
         ** User ↔ Comment
 Pendekatan ORM mempermudah pengelolaan data dan menjaga konsistensi struktur database.
 
-## Struktur Folder
+## VIII. Struktur Folder
 ```
 app/
 │
@@ -270,7 +270,7 @@ app/
     # Entry point aplikasi
 ```
 
-## Cara Instalasi dan Menjalankan Informasi
+## IX. Cara Instalasi dan Menjalankan Informasi
 ### 1. Clone Repository
 ```
 git clone <url-repository>
