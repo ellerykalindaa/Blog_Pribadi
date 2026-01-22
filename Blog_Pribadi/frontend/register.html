@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReelBlog - Daftar Akun</title>
+    <link rel="stylesheet" href="/frontend/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">📝 ReelBlog</div>
+                <nav>
+                    <ul>
+                        <li><a href="/">🏠 Home</a></li>
+                        <li><a href="/frontend/login.html">🔑 Login</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <a href="/frontend/login.html" class="btn btn-secondary">Login</a>
+                    <a href="/frontend/register.html" class="btn btn-primary active">Daftar</a>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div id="messageContainer"></div>
+            
+            <div class="form-container">
+                <div class="text-center mb-30">
+                    <h1 class="form-title">Buat Akun Baru</h1>
+                    <p class="form-subtitle">Bergabunglah dengan komunitas penulis kami</p>
+                </div>
+                
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="username">
+                            <span>👤 Username</span>
+                            <span style="color: #666; font-size: 12px; font-weight: normal; margin-left: 5px;">(minimal 3 karakter)</span>
+                        </label>
+                        <input type="text" id="username" name="username" required 
+                               placeholder="Masukkan username Anda">
+                        <div id="usernameError" class="error-message"></div>
+                    </div>
+                    
+                    <div class="form-group password-toggle">
+                        <label for="password">
+                            <span>🔒 Password</span>
+                            <span style="color: #666; font-size: 12px; font-weight: normal; margin-left: 5px;">(minimal 6 karakter)</span>
+                        </label>
+                        <input type="password" id="password" name="password" required 
+                               placeholder="Buat password yang kuat">
+                        <button type="button" class="toggle-password" id="togglePassword">👁️</button>
+                        <div id="passwordError" class="error-message"></div>
+                        <div id="passwordCounter" class="char-counter">0 karakter</div>
+                    </div>
+                    
+                    <div class="form-group password-toggle">
+                        <label for="confirmPassword">🔁 Konfirmasi Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required 
+                               placeholder="Ulangi password Anda">
+                        <button type="button" class="toggle-password" id="toggleConfirmPassword">👁️</button>
+                        <div id="confirmPasswordError" class="error-message"></div>
+                        <div id="confirmPasswordCounter" class="char-counter">0 karakter</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="d-flex align-center justify-between">
+                            <div>
+                                <input type="checkbox" id="terms" name="terms" required>
+                                <label for="terms" style="display: inline; font-weight: normal;">
+                                    Saya menyetujui 
+                                    <a href="#" style="color: #667eea; text-decoration: none;">Syarat & Ketentuan</a>
+                                </label>
+                            </div>
+                            <button type="button" onclick="fillDemoData()" class="btn-small" 
+                                    style="background: #f8f9fa; color: #666; border: 1px solid #ddd;">
+                                Isi Data Demo
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <span id="btnText">📝 Daftar Sekarang</span>
+                            <div id="btnLoading" class="loading-spinner" style="display: none;"></div>
+                        </button>
+                        <div>
+                            <span style="color: #666;">Sudah punya akun?</span>
+                            <a href="/frontend/login.html" class="form-link">Login di sini</a>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-20" style="color: #888; font-size: 14px;">
+                    <p>Dengan mendaftar, Anda setuju dengan kebijakan privasi kami</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2024 ReelBlog. Platform blogging modern untuk cerita Anda.</p>
+            <p class="footer-stats" id="footerStats"></p>
+        </footer>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+        
+        document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('confirmPassword');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+        
+        // Update character counters
+        function updateCharCounter(inputId, counterId) {
+            const input = document.getElementById(inputId);
+            const counter = document.getElementById(counterId);
+            
+            input.addEventListener('input', function() {
+                const count = this.value.length;
+                counter.textContent = `${count} karakter`;
+                
+                if (count > 60) {
+                    counter.className = 'char-counter warning';
+                } else if (count > 70) {
+                    counter.className = 'char-counter error';
+                } else {
+                    counter.className = 'char-counter';
+                }
+            });
+        }
+        
+        updateCharCounter('password', 'passwordCounter');
+        updateCharCounter('confirmPassword', 'confirmPasswordCounter');
+        
+        // Fill demo data
+        function fillDemoData() {
+            const randomId = Math.floor(Math.random() * 10000);
+            const username = `user_${randomId}`;
+            const password = 'password123';
+            
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+            document.getElementById('confirmPassword').value = password;
+            document.getElementById('terms').checked = true;
+            
+            showMessage(`✅ Data demo diisi: ${username}`, 'success');
+        }
+        
+        // Show message
+        function showMessage(message, type = 'info') {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `
+                <div class="alert alert-${type}">
+                    ${message}
+                    <button class="close-alert-btn">&times;</button>
+                </div>
+            `;
+            
+            container.querySelector('.close-alert-btn').addEventListener('click', () => {
+                container.innerHTML = '';
+            });
+            
+            setTimeout(() => {
+                if (container.innerHTML.includes('alert')) {
+                    container.innerHTML = '';
+                }
+            }, 5000);
+        }
+        
+        // Show field error
+        function showFieldError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const errorDiv = document.getElementById(`${fieldId}Error`);
+            
+            if (field && errorDiv) {
+                field.classList.add('input-error');
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+            }
+        }
+        
+        // Clear field error
+        function clearFieldError(fieldId) {
+            const field = document.getElementById(fieldId);
+            const errorDiv = document.getElementById(`${fieldId}Error`);
+            
+            if (field && errorDiv) {
+                field.classList.remove('input-error');
+                errorDiv.style.display = 'none';
+            }
+        }
+        
+        // Validate form
+        function validateForm() {
+            let isValid = true;
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const terms = document.getElementById('terms').checked;
+            
+            // Clear previous errors
+            clearFieldError('username');
+            clearFieldError('password');
+            clearFieldError('confirmPassword');
+            
+            // Validate username
+            if (!username) {
+                showFieldError('username', 'Username harus diisi');
+                isValid = false;
+            } else if (username.length < 3) {
+                showFieldError('username', 'Username minimal 3 karakter');
+                isValid = false;
+            } else if (/\s/.test(username)) {
+                showFieldError('username', 'Username tidak boleh mengandung spasi');
+                isValid = false;
+            }
+            
+            // Validate password
+            if (!password) {
+                showFieldError('password', 'Password harus diisi');
+                isValid = false;
+            } else if (password.length < 6) {
+                showFieldError('password', 'Password minimal 6 karakter');
+                isValid = false;
+            }
+            
+            // Validate confirm password
+            if (!confirmPassword) {
+                showFieldError('confirmPassword', 'Konfirmasi password harus diisi');
+                isValid = false;
+            } else if (password !== confirmPassword) {
+                showFieldError('confirmPassword', 'Password tidak cocok');
+                isValid = false;
+            }
+            
+            // Validate terms
+            if (!terms) {
+                showMessage('❌ Anda harus menyetujui Syarat & Ketentuan', 'error');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        // Set loading state
+        function setLoading(isLoading) {
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoading = document.getElementById('btnLoading');
+            
+            if (isLoading) {
+                submitBtn.disabled = true;
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'block';
+            } else {
+                submitBtn.disabled = false;
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+            }
+        }
+        
+        // Handle register form
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            setLoading(true);
+            
+            try {
+                const registerData = {
+                    username: username,
+                    password: password
+                };
+                
+                console.log('Register request:', { ...registerData, password: '***' });
+                
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(registerData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage('✅ ' + (result.message || 'Registrasi berhasil!'), 'success');
+                    
+                    // Auto login after successful registration
+                    try {
+                        const loginResponse = await fetch(`${API_URL}/auth/login`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ username, password })
+                        });
+                        
+                        if (loginResponse.ok) {
+                            const loginData = await loginResponse.json();
+                            localStorage.setItem('token', loginData.access_token);
+                            localStorage.setItem('username', username);
+                            
+                            // Save user_id dari login response
+                            if (loginData.user_id) {
+                                localStorage.setItem('user_id', loginData.user_id);
+                            }
+                            
+                            showMessage('🎉 Login otomatis berhasil! Mengalihkan...', 'success');
+                            
+                            setTimeout(() => {
+                                window.location.href = 'index.html';
+                            }, 2000);
+                        }
+                    } catch (loginError) {
+                        // If auto login fails, redirect to login page
+                        setTimeout(() => {
+                            window.location.href = 'login.html?message=' + 
+                                encodeURIComponent('Registrasi berhasil! Silakan login.');
+                        }, 2000);
+                    }
+                    
+                } else {
+                    if (result.detail) {
+                        showMessage(`❌ ${result.detail}`, 'error');
+                        
+                        if (typeof result.detail === 'string') {
+                            if (result.detail.toLowerCase().includes('username')) {
+                                showFieldError('username', result.detail);
+                            } else if (result.detail.toLowerCase().includes('password')) {
+                                showFieldError('password', result.detail);
+                            }
+                        }
+                    } else {
+                        showMessage(`❌ Registrasi gagal (${response.status})`, 'error');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Register error:', error);
+                showMessage('❌ Terjadi kesalahan. Coba lagi nanti.', 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+        
+        // Clear errors on input
+        document.getElementById('username').addEventListener('input', () => clearFieldError('username'));
+        document.getElementById('password').addEventListener('input', () => clearFieldError('password'));
+        document.getElementById('confirmPassword').addEventListener('input', () => clearFieldError('confirmPassword'));
+        
+        // Check if already logged in
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                // Verify token is valid before redirecting
+                try {
+                    const response = await fetch(`${API_URL}/auth/me`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        // Token valid, redirect to home
+                        window.location.href = 'index.html';
+                        return;
+                    } else {
+                        // Token invalid, clear and continue with register form
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('username');
+                        localStorage.removeItem('user_id');
+                    }
+                } catch (error) {
+                    // Error verifying token, clear and continue
+                    console.log('Token verification failed:', error);
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('user_id');
+                }
+            }
+            
+            // Continue with normal register page setup
+            // Check for URL messages
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            const type = urlParams.get('type');
+            
+            if (message) {
+                showMessage(decodeURIComponent(message), type || 'info');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            
+            // Update footer stats
+            updateFooterStats();
+        });
+        
+        // Update footer stats
+        async function updateFooterStats() {
+            try {
+                const response = await fetch(`${API_URL}/posts`);
+                if (response.ok) {
+                    const posts = await response.json();
+                    const statsDiv = document.getElementById('footerStats');
+                    if (statsDiv) {
+                        statsDiv.textContent = `📊 ${Array.isArray(posts) ? posts.length : 0} postingan tersedia`;
+                    }
+                }
+            } catch (error) {
+                // Silent fail
+            }
+        }
+        
+        // Auto fill demo data for testing
+        if (window.location.search.includes('demo=true')) {
+            setTimeout(fillDemoData, 500);
+        }
+    </script>
+</body>
+</html>

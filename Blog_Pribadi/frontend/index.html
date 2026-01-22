@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReelBlog - Home</title>
+    <link rel="stylesheet" href="/frontend/style.css">
+    <link rel="stylesheet" href="/frontend/index.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">📚 ReelBlog</div>
+                <nav>
+                    <ul>
+                        <li><a href="/" class="active">🏠 Home</a></li>
+                        <li><a href="/frontend/create.html" id="createPostLink" style="display: none;">✏️ Buat Post</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <div class="profile-info" id="profileInfo" style="display: none;">
+                        <div class="profile-avatar" id="userAvatar"></div>
+                        <span id="usernameDisplay"></span>
+                    </div>
+                    <a class="btn btn-primary" id="loginBtn" href="/frontend/login.html">🔐 Login</a>
+                    <a class="btn btn-secondary" id="registerBtn" href="/frontend/register.html">👤 Daftar</a>
+                    <button class="btn btn-danger" id="logoutBtn" style="display: none;">🚪 Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <h1>📚 Postingan Terbaru</h1>
+            
+            <div id="messageContainer"></div>
+
+            <!-- Controls Section: Search & View Toggle -->
+            <div class="controls-section">
+                <div class="search-bar">
+                    <span style="color: #666;">🔍</span>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Cari berdasarkan judul atau konten..." 
+                        autocomplete="off"
+                    >
+                </div>
+                <div class="view-toggle">
+                    <span style="color: #666; font-size: 13px;">Tampilan:</span>
+                    <label>
+                        <input type="radio" name="viewMode" value="list" checked>
+                        📋 List
+                    </label>
+                    <label>
+                        <input type="radio" name="viewMode" value="grid">
+                        📱 Grid
+                    </label>
+                </div>
+                
+                <div class="category-filter">
+                    <span style="color: #666; font-size: 13px;">Kategori:</span>
+                    <select id="categoryFilter">
+                        <option value="">Semua Kategori</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="searchInfo"></div>
+            
+            <div class="posts-container list-view" id="postsContainer">
+                <div class="loading-spinner"></div>
+                <div style="text-align: center; color: #666; margin-top: 10px;">Memuat postingan...</div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2024 ReelBlog. Platform blogging modern untuk cerita Anda.</p>
+            <p class="footer-stats" id="footerStats" style="margin-top: 10px; font-size: 14px; color: #666;"></p>
+        </footer>
+    </div>
+
+    <script src="/frontend/index.js"></script>
+</body>
+</html>
