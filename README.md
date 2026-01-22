@@ -8,10 +8,18 @@ blog pribadi adalah sistem server-side yang mengelola data dan logika aplikasi b
 <br>1. I Putu Mahardika ( 240030041 ) --> username GitHub : putumahardika
 <br>2. I NYOMAN REYNALD ADITYA PARMANDA ( 240030245 )  --> username GitHub : reynaldaditya 
 <br>3. MADE ELLERY KALINDA ( 240030341 )  --> username GitHub : ellerykalindaa
-<br>4. I MADE BAGUS SATRIA PAWANA KESUMA PUTRA ( 240030244 )  --> username GitHub : 
+<br>4. I MADE BAGUS SATRIA PAWANA KESUMA PUTRA ( 240030244 )  --> username GitHub : satriapawan
 <br>5. ALIF DZULFIKAR BAGHIS ( 200030710 )  --> username GitHub : 
-<hr>
 
+### Peran dan Tugas setiap Anggota :
+  * 1. I Putu Mahardika -> Membuat Dokumentasi Program Sistem Blog Pribadi di Readme, Membantu merancang Struktur, Diskusi awal dalam menentukan konsep pembuatan
+  * 2. I NYOMAN REYNALD ADITYA PARMANDA ->
+  * 3. MADE ELLERY KALINDA ->
+  * 4. I MADE BAGUS SATRIA PAWANA KESUMA PUTRA ->
+  * 5. ALIF DZULFIKAR BAGHIS -> Report : Gaguna, AFK, Menyusahkan Tim, Tidak ada Berkontribusi
+    
+<hr>
+  
 ## III. Lingkungan Pengembangan dari Blog Pribadi
   ###  Alat dan Teknologi:
     * Laptop >> Digunakan untuk membuat atau mengeksekusi kode program, masing - masing orang menggunakan laptop untuk terlibat dalam pengerjaan project blog pribadi ini
